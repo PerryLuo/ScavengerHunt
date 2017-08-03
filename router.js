@@ -21,9 +21,14 @@ module.exports = (express) => {
       });
 
     router.get('/gamemenu', (req, res) => {
-        var userName = req.session.passport.user
-        res.redirect('/user/'+userName)
+        res.render('gamemenu')
     });
+
+    router.get('/gamesetup', (req, res) => {
+        res.render('gamesetup')
+    });
+
+// below code is for reference only
 
     router.get('/error', (req, res) => {
         res.send('You fail!');

@@ -16,7 +16,7 @@ module.exports = (app) => {
         callbackURL: "http://127.0.0.1:8080/auth/google/googletoken"
         },
         function(accessToken, refreshToken, profile, cb) {
-            User.findOne({
+            User.findOrCreate({
                 googleId: profile.id
             },
             function (err, user) {
