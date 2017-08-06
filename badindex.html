@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf">
+    <title>Google Maps Embed test</title>
+</head>
+<body>
+    <iframe
+        id = "myMap"
+        width="600"
+        height="450"
+        frameborder="0" style="border:0"
+        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAxdoUnacxkFutHqLELSwyAdOrwStESP_c&q=(39.7391536,-104.9847034)" allowfullscreen>
+    </iframe>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+    $(document).ready(function(){
+        var long = 39.7391536;
+        var lat = -104.9847024;
+        function newSrc(srcStr, newLong, newLat) {
+            $('iframe#myMap').attr('src', srcStr);
+            long = newLong;
+            lat = newLat;
+        }
+        function changeQ(long, lat, callback) {
+            source = $('iframe#myMap').attr('src');
+            var newLong = long + 0.1;
+            var newLat = lat + 0.1;
+            console.log(long, lat);
+            source = source.replace(RegExp((long).toString()), newLong.toString());
+            source = source.replace(RegExp((lat).toString()), newLat.toString());
+            callback(source, newLong, newLat);
+            //console.log(document.getElementById('myMap').src);
+            //console.log(long, lat);
+        }
+        var intervalTimer;
+        intervalTimer = setInterval(changeQ(long, lat, newSrc), 1000);
+    });
+        //setTimeout(function(){clearInterval(intervalTimer)}, 20000);
+    </script>
+</body>
+</html>
