@@ -1,11 +1,16 @@
 //router.js
 const passport = require('passport');
-// const Model = require('./models');
-// const User = Model.trackMyFriends
+const User = require('./models').user;
 
 
 module.exports = (express) => {
+
     const router = express.Router();
+
+    function isLoggedIn(req, res, next) {
+        if (req.isAuthenticated()) return next();
+        res.redirect('/');
+    }
 
     router.get('/login', (req, res) => {
         res.render('login');
@@ -20,11 +25,11 @@ module.exports = (express) => {
         res.redirect('/gamemenu');
       });
 
-    router.get('/gamemenu', (req, res) => {
+    router.get('/gamemenu', isLoggedIn, (req, res) => {
         res.render('gamemenu')
     });
 
-    router.get('/gamesetup', (req, res) => {
+    router.get('/gamesetup', isLoggedIn, (req, res) => {
         res.render('gamesetup')
     });
 
@@ -34,7 +39,7 @@ module.exports = (express) => {
         res.send('You fail!');
     });
 
-    router.get('/gamemenu/:username', function(req, res) {
+    router.get('/gamemenu/:username', isLoggedIn, function(req, res) {
         User.findOne({
             where: {
                 userName: req.session.passport.user   //'.user' is the default object key to access the value in passport

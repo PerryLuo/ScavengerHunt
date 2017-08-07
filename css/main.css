@@ -1,24 +1,26 @@
 /* Always set the map height explicitly to define the size of the div
    * element that contains the map. */
- #map {
+#map {
     height: 100%;
- }
-  /* Optional: Makes the sample page fill the window. */
- html, body {
+}
+
+/* Optional: Makes the sample page fill the window. */
+html, body {
     height: 100%;
     margin: 0;
     padding: 0;
- }
+}
 
- a[href^="http://maps.google.com/maps"]{display:none !important}
- a[href^="https://maps.google.com/maps"]{display:none !important}
+a[href^="http://maps.google.com/maps"]{display: none !important}
+a[href^="https://maps.google.com/maps"]{display: none !important}
 
- .gmnoprint a, .gmnoprint span, .gm-style-cc {
-     display:none;
- }
- .gmnoprint div {
-     background:none !important;
- }
+.gmnoprint a, .gmnoprint span, .gm-style-cc {
+    display: none;
+}
+.gmnoprint div {
+    background: none !important;
+}
+
 /*CSS for the menu in the map bar*/
 .overlay {
     height: 100%;
@@ -61,10 +63,12 @@
     right: 45px;
     font-size: 60px;
 }
-#menuSpan{
+
+#menuSpan {
     position:fixed;
     z-index: 1;
 }
+
 @media screen and (max-height: 450px) {
   .overlay a {font-size: 20px}
   .overlay .closebtn {
