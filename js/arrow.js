@@ -88,6 +88,7 @@ function setArrow(origLatLng, destLatLng, map) {
 }
 
 module.exports.setArrow = setArrow;
+module.exports.getArrowCoords = getArrowCoords;
 
 /* NOTE: HOW TO USE
 

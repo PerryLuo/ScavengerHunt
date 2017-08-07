@@ -1,11 +1,22 @@
 // Helper function for zooming out to see both player and destination
 
+/* // FOR JASMINE TESTING ONLY
+var google = {maps: {LatLngBounds: class LatLngBounds {
+    constructor(sw, ne) {
+        this.south = sw.lat;
+        this.west = sw.lng;
+        this.north = ne.lat;
+        this.east = ne.lng;
+    }
+}}};
+*/
+
 // get the outer boundaries of player and destination
 function getZoomedOutBounds(origLatLng, destLatLng){
-    var north = [origCoord.lat(),destCoord.lat()].sort()[0];
-    var south = [origCoord.lat(),destCoord.lat()].sort()[1];
-    var west = [origCoord.lng(),destCoord.lng()].sort()[0];
-    var east = [origCoord.lng(),destCoord.lng()].sort()[1];
+    var south = [origLatLng.lat(),destLatLng.lat()].sort((a, b) => a - b)[0];
+    var north = [origLatLng.lat(),destLatLng.lat()].sort((a, b) => a - b)[1];
+    var west = [origLatLng.lng(),destLatLng.lng()].sort((a, b) => a - b)[0];
+    var east = [origLatLng.lng(),destLatLng.lng()].sort((a, b) => a - b)[1];
     return new google.maps.LatLngBounds(
         {lat: south, lng: west},
         {lat: north, lng: east}
