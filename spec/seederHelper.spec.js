@@ -10,7 +10,7 @@ describe('Given two lists, return the attributes as keys and the data as values'
         var lastNames = ['Snow', 'Stark', 'Redwyne'];
         var data = [usernames, emails, firstNames, lastNames];
         expect(dataArray(attributes, data)).toEqual([
-            {'username':'jonsnow', 'email':'jonson@winterfell.com', 'firstName':'Jon', 'lastName':'Snow'},
+            {'username':'jonsnow', 'email':'jonsnow@winterfell.com', 'firstName':'Jon', 'lastName':'Snow'},
             {'username':'aryastark', 'email':'aryastark@winterfell.com', 'firstName':'Arya', 'lastName':'Stark'},
             {'username':'olenna', 'email':'olenna@tyrell.com', 'firstName':'Olenna', 'lastName':'Redwyne'}
         ]);
