@@ -70,7 +70,7 @@ module.exports = (express) => {
     // Keep this for development
     router.get('/map', (req, res) => {
         res.render('map');
-
+    });
 
 // below code is for reference only
 
