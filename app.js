@@ -6,11 +6,14 @@ const bodyParser = require('body-parser');
 const router = require('./router')(express);
 const port = 3030;
 
-// var redis = require('redis');
-// var client = redis.createClient({
-//     host: 'localhost',
-//     port: 6379
-// });
+var redis = require('redis');
+var client = redis.createClient({
+    host: 'localhost',
+    port: 6379
+});
+client.on('error', function(err){
+    console.log(err);
+});
 
 const hb = require('express-handlebars');
 app.engine('handlebars', hb({
@@ -22,6 +25,8 @@ app.engine('handlebars', hb({
 app.set('view engine', 'handlebars');
 app.use(session({secret: 'canBeAnyPassword'}));
 app.use(bodyParser());
+
+app.use('/public', express.static('public'))
 
 setupPassport(app);
 app.use('/', router);

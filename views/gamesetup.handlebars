@@ -3,18 +3,61 @@
     <h2>Game Setup</h2>
     <br>
     <hr id="hr-body">
-    <form class="" action="index.html" method="post">
-        <input type="text" name="" placeholder="Team Name" value="">
-        <br>
-        <input type="number" name="" placeholder="number of players" value="">
-        <br>
-        <input type="number" name="" placeholder="Duration of game (in hours)" value="">
-        <br>
-        <input type="time" name="" placeholder="Start Time" value="">
-        <br>
-        <input type="time" name="" placeholder="End Time" value="">
-    </form>
+    <h1>Number of Players:<span id="playerNum">1</span></h1>
+    <br>
+    <button type="button" class="btn btn-danger btn-md" id="decreasePlayer">-</button>
+    <button type="button" class="btn btn-danger btn-md" id="increasePlayer">+</button>
+    <script type="text/javascript">
+        var players
+        $("#increasePlayer").click(function () {
+            players = parseInt($('#playerNum').text());
+            $('#playerNum').text(players+1)
+        });
+        $("#decreasePlayer").click(function () {
+            players = parseInt($('#playerNum').text())
+            $('#playerNum').text(players-1)
+        })
+    </script>
+
+    <h1>Choose Your Task</h1>
+    <button type="button" class="btn btn-info btn-md" id="foodTour">Food Tour</button>
+    <button type="button" class="btn btn-info btn-md" id="walkTour">Walk Tour</button>
+    <script type="text/javascript">
+        var chosenHunt = ''
+            $('#foodTour').click(function(){
+                chosenHunt = 'Food Tour'
+            $('#foodTour').css("background-color", "red")
+            $('#walkTour').css("background-color", "")
+            });
+            $('#walkTour').click(function(){
+                chosenHunt = 'Walk Tour'
+            $('#walkTour').css("background-color", "red")
+            $('#foodTour').css("background-color", "")
+            });
+    </script>
     <br>
     <br>
-    <a href="/gamemenu" class="btn btn-primary btn-lg" role="button">Back to Game Setup</a>
+    <br>
+    <br>
+    <br>
+    <a href ='/gamemenu' id="returnGame" class="btn btn-primary btn-lg" role="button">Back to Game Setup</a>
+    <script type="text/javascript">
+            $('#returnGame').click(function(){
+                if (chosenHunt!='') {
+                        console.log('this is the hunt' + chosenHunt)
+                $.post('/chosenhunt',{hunt:chosenHunt})
+                    .done(function (startHunt) {
+                        client.setex(JSON.Stringify(startHunt),function(err, data){
+                            if(err){
+                                return console.log(err)
+                            }
+                            console.log(JSON.Stringify(startHunt))
+                        })
+                        // localStorage.setItem('hunt', startHunt)
+                    })
+                }
+            })
+    </script>
+    <br>
+    <br>
 </div>

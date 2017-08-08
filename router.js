@@ -1,6 +1,7 @@
 //router.js
 const passport = require('passport');
 const User = require('./models').user;
+const Hunt = require('./models').hunt;
 
 
 module.exports = (express) => {
@@ -9,7 +10,7 @@ module.exports = (express) => {
 
     function isLoggedIn(req, res, next) {
         if (req.isAuthenticated()) return next();
-        res.redirect('/');
+        res.redirect('/gamemenu');
     }
 
     router.get('/login', (req, res) => {
@@ -31,6 +32,18 @@ module.exports = (express) => {
 
     router.get('/gamesetup', isLoggedIn, (req, res) => {
         res.render('gamesetup')
+    });
+
+    router.post('/chosenhunt', isLoggedIn, (req, res) => {
+        Hunt.findOne({
+            where:{
+                name: req.body.hunt
+            }
+        })
+        .then(function(data){
+            console.log(data)
+            res.json(data.dataValues)
+        })
     });
 
 // below code is for reference only
