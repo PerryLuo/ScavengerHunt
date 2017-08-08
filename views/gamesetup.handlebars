@@ -46,15 +46,6 @@
                 if (chosenHunt!='') {
                         console.log('this is the hunt' + chosenHunt)
                 $.post('/chosenhunt',{hunt:chosenHunt})
-                    .done(function (startHunt) {
-                        client.setex(JSON.Stringify(startHunt),function(err, data){
-                            if(err){
-                                return console.log(err)
-                            }
-                            console.log(JSON.Stringify(startHunt))
-                        })
-                        // localStorage.setItem('hunt', startHunt)
-                    })
                 }
             })
     </script>

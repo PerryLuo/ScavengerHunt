@@ -6,15 +6,6 @@ const bodyParser = require('body-parser');
 const router = require('./router')(express);
 const port = 3030;
 
-var redis = require('redis');
-var client = redis.createClient({
-    host: 'localhost',
-    port: 6379
-});
-client.on('error', function(err){
-    console.log(err);
-});
-
 const hb = require('express-handlebars');
 app.engine('handlebars', hb({
     defaultLayout: 'main',

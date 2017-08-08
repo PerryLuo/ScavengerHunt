@@ -1,5 +1,6 @@
 //router.js
 const passport = require('passport');
+const client = require('./redis')
 const User = require('./models').user;
 const Hunt = require('./models').hunt;
 
@@ -40,10 +41,18 @@ module.exports = (express) => {
                 name: req.body.hunt
             }
         })
-        .then(function(data){
-            console.log(data)
-            res.json(data.dataValues)
+        .then(function(hunt){
+            console.log(req.session.passport.user)
+            client.set('hunt'+req.session.passport.user, JSON.stringify(hunt),function(err, data){
+                if(err){
+                    return console.log(err)
+                }
+            })
         })
+    });
+
+    router.get('/playgame', isLoggedIn, (req, res) => {
+        res.render('map')
     });
 
 // below code is for reference only
