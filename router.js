@@ -1,6 +1,8 @@
 //router.js
 const passport = require('passport');
+const client = require('./redis')
 const User = require('./models').user;
+const Hunt = require('./models').hunt;
 
 
 module.exports = (express) => {
@@ -9,7 +11,7 @@ module.exports = (express) => {
 
     function isLoggedIn(req, res, next) {
         if (req.isAuthenticated()) return next();
-        res.redirect('/');
+        res.redirect('/gamemenu');
     }
 
     router.get('/public/js/:file', (req, res) => {
@@ -45,9 +47,30 @@ module.exports = (express) => {
         res.render('gamesetup')
     });
 
+    router.post('/chosenhunt', isLoggedIn, (req, res) => {
+        Hunt.findOne({
+            where:{
+                name: req.body.hunt
+            }
+        })
+        .then(function(hunt){
+            console.log(req.session.passport.user)
+            client.set('hunt'+req.session.passport.user, JSON.stringify(hunt),function(err, data){
+                if(err){
+                    return console.log(err)
+                }
+            })
+        })
+    });
+
+    router.get('/playgame', isLoggedIn, (req, res) => {
+        res.render('map')
+    });
+
+    // Keep this for development
     router.get('/map', (req, res) => {
         res.render('map');
-    });
+
 
 // below code is for reference only
 
@@ -73,36 +96,6 @@ module.exports = (express) => {
         successRedirect: '/user',
         failureRedirect: '/error'
     }));
-
-    // router.post('/signup', function(req, res){
-    //     console.log('data is' + req.body.password)
-    //     var createUserName = req.body.username //data is in an object --- '.createUserName is name we labled in the form->input'
-    //     var createPassword = req.body.password
-    //     var registerFirstName = req.body.firstName
-    //     var registerLastName = req.body.lastName
-    //     bcrypt.hashPassword(createPassword)
-    //         .then(hash => {
-    //             password: hash
-    //         })
-    //         User.create({
-    //             userName: createUserName,
-    //             Password: createPassword,
-    //             firstName: registerFirstName,
-    //             lastName: registerLastName
-    //         })
-    //     .then(function (result) {
-    //         req.login(result, function(err){
-    //             if (err) {
-    //                 console.log(err)
-    //                 res.redirect ('/error')
-    //             }
-    //             return res.redirect ('/user/' + result.username)
-    //         })
-    //     })
-    //     .catch(function (err) {
-    //         console.log('Account failed to create ' + err)
-    //     })
-    // });
 
     return router;
 };
