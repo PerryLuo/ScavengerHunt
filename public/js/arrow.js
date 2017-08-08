@@ -87,8 +87,15 @@ function setArrow(origLatLng, destLatLng, map) {
     });
 }
 
-module.exports.setArrow = setArrow;
-module.exports.getArrowCoords = getArrowCoords;
+function destinationInMap(destLatLng) {
+    var bounds = map.getBounds();
+    var N = bounds.f.f, W = bounds.b.b, S = bounds.f.b, E = bounds.b.f;
+    return (destLatLng.lat() > S & destLatLng.lat() < N
+            & destLatLng.lng() > W & destLatLng.lng() < E);
+}
+
+// module.exports.setArrow = setArrow;
+// module.exports.getArrowCoords = getArrowCoords;
 
 /* NOTE: HOW TO USE
 

@@ -12,6 +12,18 @@ module.exports = (express) => {
         res.redirect('/');
     }
 
+    router.get('/public/js/:file', (req, res) => {
+        var filename = req.params.file;
+        res.sendFile(__dirname + '/js/' + filename);
+    });
+    router.get('/public/css/main.css', (req, res) => {
+        res.sendFile(__dirname + '/css/main.css');
+    });
+    router.get('/public/art/:file', (req, res) => {
+        var filename = req.params.file;
+        res.sendFile(__dirname + '/art/' + filename);
+    });
+
     router.get('/login', (req, res) => {
         res.render('login');
     });
@@ -31,6 +43,10 @@ module.exports = (express) => {
 
     router.get('/gamesetup', isLoggedIn, (req, res) => {
         res.render('gamesetup')
+    });
+
+    router.get('/map', (req, res) => {
+        res.render('map');
     });
 
 // below code is for reference only

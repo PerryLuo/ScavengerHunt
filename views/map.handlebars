@@ -9,9 +9,31 @@
         <a href="#">Exit</a>
     </div>
 </div>
+
 <!-- Google Map -->
 <div id="map"></div>
+<div id="distance"><span id="distanceText"></span></div>
+<div id="zoomAndCenter">
+    <a href="javascript:map.fitBounds(getZoomedOutBounds(playerMarker.getPosition(), destinationPosition));">
+        <span class="glyphicon glyphicon-zoom-out"></span>
+    </a>
+    &nbsp;
+    <a href="javascript:map.setCenter(playerMarker.getPosition());">
+        <span class="glyphicon glyphicon-screenshot"></span>
+    </a>
+</div>
+
 <!-- Javascript -->
-<script src="js/index.js"></script>
-<!-- customized css file -->
-<link rel="stylesheet" href="css/main.css">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5VPdkr79bv-_2TnnwoFXhZgHF2ztZycg&libraries=geometry,places"></script>
+    <!-- PL API key = AIzaSyAOxhOC9pjODy1pcnKNzijSqHLncZNVagQ -->
+    <!-- HL API key = AIzaSyA5VPdkr79bv-_2TnnwoFXhZgHF2ztZycg -->
+    <!-- HL: Deleted `async defer` because our js files depend on the
+             `google` and `google.maps` objects to load completely first -->
+<script src="public/js/mapLayout.js"></script>
+<script src="public/js/zoomOut.js"></script>
+<script src="public/js/arrow.js"></script>
+<!-- <script src="js/script.js"></script> -->
+<script src="public/js/index.js"></script>
+<script>
+    initMap();
+</script>

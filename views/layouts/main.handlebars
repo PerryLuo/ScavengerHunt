@@ -12,20 +12,12 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
         <!-- customized css file -->
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="public/css/main.css">
     </head>
     <body>
         {{{body}}}
-
-
-
-        <div id="map"></div>
-
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="js/script.js"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOxhOC9pjODy1pcnKNzijSqHLncZNVagQ&libraries=geometry,places&callback=initMap"
-        async defer></script>
-            <!-- HL: May want to delete `async defer` because some of our helper functions
-                     rely on the google api loading completely first -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <!-- HL: moved all of the map-related scripts to map.handlebars -->
     </body>
 </html>

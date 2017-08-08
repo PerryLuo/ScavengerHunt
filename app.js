@@ -22,6 +22,7 @@ app.engine('handlebars', hb({
 app.set('view engine', 'handlebars');
 app.use(session({secret: 'canBeAnyPassword'}));
 app.use(bodyParser());
+app.use('/public', express.static('public'));
 
 setupPassport(app);
 app.use('/', router);

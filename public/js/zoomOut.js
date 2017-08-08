@@ -23,7 +23,7 @@ function getZoomedOutBounds(origLatLng, destLatLng){
     );
 }
 
-module.exports = getZoomedOutBounds;
+// module.exports = getZoomedOutBounds;
 
 /* EXAMPLE
 
