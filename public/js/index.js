@@ -1,9 +1,9 @@
 var id, options;
 var map, arrow, currentPosition, destinationPosition;
 var playerMarker, destMarker;
-var distance;
-
-var wanchai = {lat: 22.2760, lng: 114.1751};
+var distance, destinationCounter = 0;
+var huntId, itineraryLength;
+var currentTask, currentChallenge = 0;
 
 function success(pos) {
     currentPosition = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
@@ -18,6 +18,10 @@ function success(pos) {
     distance = Math.round(google.maps.geometry.spherical
         .computeDistanceBetween(currentPosition, destinationPosition));
     document.getElementById('distanceText').textContent = distance + ' meters to go!';
+    if (distance <= 15 && currentChallenge === 0) {
+        currentChallenge = 1;
+        openChallenge();
+    }
     console.log(pos.coords.latitude, pos.coords.longitude);
 }
 
@@ -42,6 +46,30 @@ options = {
     maximumAge: 0
 };
 
+function getDestTask(huntId) {
+    if (destinationCounter >= itineraryLength) {
+        $.get('/gameend');
+    } else {
+        $.get('/itinerary?id=' + huntId + '&counter=' + destinationCounter, function(data){
+            destinationPosition = new google.maps.LatLng(data.destination.latitude, data.destination.longitude);
+            $('#challenge').find('p:first').html(data.task.question);
+            currentTask = data.task;
+            var destImage = 'public/art/batmancall.png';
+            if (!destMarker) {
+                destMarker = new google.maps.Marker({
+                    position: destinationPosition,
+                    map: map,
+                    icon: destImage
+                });
+            } else {
+                destMarker.setPosition(destinationPosition);
+            }
+            map.fitBounds(getZoomedOutBounds(currentPosition, destinationPosition));
+            destinationCounter++;
+        });
+    }
+}
+
 function initMap() {
 
     if (!navigator.geolocation) {
@@ -60,19 +88,18 @@ function initMap() {
             });
 
             var playerImage = 'public/art/batman.png';
-            var destImage = 'public/art/batmancall.png';
-
             playerMarker = new google.maps.Marker({
                 position: currentPosition,
                 map: map,
                 icon: playerImage,
                 draggable: true
             });
-            destMarker = new google.maps.Marker({
-                position: destinationPosition,
-                map: map,
-                icon: destImage
+
+            $.get('/itinerary?id=' + huntId, function(data){
+                itineraryLength = parseInt(data);
             });
+
+            getDestTask(huntId);
 
             var service = new google.maps.places.PlacesService(map);
 
@@ -116,7 +143,7 @@ function initMap() {
                         playerMarker.getPosition().lat(),
                         playerMarker.getPosition().lng()
                     ), destinationPosition));
-                document.getElementById('distanceText').textContent = distance;
+                document.getElementById('distanceText').textContent = distance + " meters to go!";
             });
 
             id = navigator.geolocation.watchPosition(success, error, options);
@@ -134,4 +161,59 @@ function openNav() {
 
 function closeNav() {
     document.getElementById("myNav").style.width = "0%";
+}
+
+function openChallenge() {
+    document.getElementById("challenge").style.width = "100%";
+}
+
+function closeChallenge() {
+    document.getElementById("challenge").style.width = "0%";
+}
+
+function checkAnswer() {
+    var submitted = $('#answer').val();
+    $('#answer').val('');
+    console.log("I was called!");
+    if (submitted.toLowerCase() === currentTask.answer.toString().toLowerCase()) {
+        console.log("correct answer!");
+        closeChallenge();
+        $('#tries').text('3');
+        $('#score>h1').html("You earned " + currentTask.score + " points!");
+        $.post('/updatescore?add=' + currentTask.score);
+        $('#score').css('z-index', '1');
+        setTimeout(function(){
+            $('#score>h1').html('');
+            $('#score').css('z-index', '-1');
+        }, 4000);
+        getDestTask(huntId);
+    } else {
+        console.log("wrong answer!");
+        var tries = parseInt($('#tries').text());
+        if (tries > 1) {
+            $('#tries').text(tries-1);
+        } else {
+            closeChallenge();
+            $('#tries').text('3');
+            $('#score>h1').html("You failed! Next destination...");
+            $('#score').css('z-index', '1');
+            setTimeout(function(){
+                $('#score>h1').html('');
+                $('#score').css('z-index', '-1');
+            }, 4000);
+            getDestTask(huntId);
+        }
+    }
+}
+
+function giveUp(){
+    closeChallenge();
+    $('#tries').text('3');
+    $('#score>h1').html("You gave up?! Oh well, next destination.");
+    $('#score').css('z-index', '1');
+    setTimeout(function(){
+        $('#score>h1').html('');
+        $('#score').css('z-index', '-1');
+    }, 4000);
+    getDestTask(huntId);
 }

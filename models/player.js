@@ -3,7 +3,8 @@ module.exports = function(sequelize, DataTypes) {
     var player = sequelize.define('player', {
         userId: DataTypes.INTEGER,
         gameplayId: DataTypes.INTEGER,
-        teamId: DataTypes.INTEGER
+        teamId: DataTypes.INTEGER,
+        score: DataTypes.INTEGER,
     });
     player.associate = function(models) {
         player.belongsTo(models.user, {foreignKey: 'userId'});

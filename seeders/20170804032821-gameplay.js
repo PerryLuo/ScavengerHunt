@@ -1,6 +1,6 @@
 'use strict';
 
-var dataArray = require('../js/seederHelper').dataArray;
+var dataArray = require('../public/js/seederHelper').dataArray;
 var names = ['Food', 'Spacious places'];
 var huntIds = [1,2];
 var organizerIds = [2,3];

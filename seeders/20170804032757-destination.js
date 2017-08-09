@@ -1,6 +1,6 @@
 'use strict';
 
-var dataArray = require('../js/seederHelper').dataArray;
+var dataArray = require('../public/js/seederHelper').dataArray;
 var names = ["WeWork", "Southern Playground", "Expo Promenade", 'Butchers Club', 'Sikh Temple', 'Hung Sing Temple', 'Hing Kee Wontons', 'Coyote Bar & Grill', "Paisano's Pizzeria", "Amoy Street", 'Hong Kong Cemetery', 'Tamar Park', 'Hong Kong Park', 'Victoria Park', 'Hong Kong Cultural Centre'];
 var latitudes = [22.278357,22.276936,22.284805,22.276957,22.27454,22.275427,22.278593,22.278019,22.277203,22.275874,22.270909,22.281712,22.277653,22.282595,22.293778];
 var longitudes = [114.17006,114.172332,114.17331,114.169195,114.177979,114.170839,114.172965,114.172558,114.173469,114.172088,114.179845,114.165719,114.161874,114.189232,114.17035];

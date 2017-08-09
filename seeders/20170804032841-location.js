@@ -1,6 +1,6 @@
 'use strict';
 
-var dataArray = require('../js/seederHelper').dataArray;
+var dataArray = require('../public/js/seederHelper').dataArray;
 var neighborhoods = ['Wanchai', 'Admiralty', 'Central', 'Causeway Bay', 'Tsimshatsui'];
 var districts = ['Hong Kong Island', 'Hong Kong Island', 'Hong Kong Island', 'Hong Kong Island', 'Kowloon West'];
 var cities = ['Hong Kong', 'Hong Kong', 'Hong Kong', 'Hong Kong', 'Hong Kong'];

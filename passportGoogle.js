@@ -9,18 +9,16 @@ module.exports = (app) => {
     app.use(passport.session());
 
     passport.use(new GoogleStrategy({
-        clientID: '121718160890-mefo9636o4dcd3ova9h3h6kl2ujd35rk.apps.googleusercontent.com',
-        clientSecret: 'JCS_ptZY7pia25QJ8SVgraPK',
-        callbackURL: "http://7bbb3953.ngrok.io/auth/google/googletoken"
+        clientID: '530099490791-e13gnvdek6bv6ftlcovuga493jrnrso2.apps.googleusercontent.com',
+        clientSecret: 'z-xgz8YLUoKjgk7E2M98HSyb',
+        callbackURL: "http://cee4441f.ngrok.io/auth/google/googletoken"
     }, function(accessToken, refreshToken, profile, cb) {
         console.log(profile);
-        User.findOrCreate({where:{email:profile.id}
-            // email: profile.id // HL: should change this to `email: ...`
-        })
-        .then(
-            function(user) {
-                return cb(null, user);
-            });
+        User.findOrCreate({where:{googleId:profile.id}})
+            .then(
+                function(user) {
+                    return cb(null, user);
+                });
     }));
 
     passport.serializeUser((user, done) => {

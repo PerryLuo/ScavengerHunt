@@ -1,6 +1,6 @@
 'use strict';
 
-var dataArray = require('../js/seederHelper').dataArray;
+var dataArray = require('../public/js/seederHelper').dataArray;
 var names = ['Food Tour', 'Walk Tour'];
 var publicAccesses = ['true', 'true'];
 var itineraries = [ [[1,1],[7,7],[8,8],[9,9],[5,5],[10,10],[4,4]], [[1,1],[2,2],[14,14],[3,3],[15,15],[12,12],[13,13]] ];

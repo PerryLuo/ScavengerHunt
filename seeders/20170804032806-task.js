@@ -1,6 +1,6 @@
 'use strict';
 
-var dataArray = require('../js/seederHelper').dataArray;
+var dataArray = require('../public/js/seederHelper').dataArray;
 var scores = ['100','100','100','100','200','200','200','100','100','100','300','300','200','100','200'];
 var destinationIds = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
 var types = ['question','question','question','question','question','question','question','question','question','question','question','question','question','question','question'];

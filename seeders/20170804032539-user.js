@@ -1,6 +1,7 @@
 'use strict';
 
-var dataArray = require('../js/seederHelper').dataArray;
+var dataArray = require('../public/js/seederHelper').dataArray;
+var googleIds = ['', '106042834711120410141', '104515843863940371388'];
 var emails = ['miguelps63@gmail.com', 'perry.luo@gmail.com', 'leung.hm@gmail.com'];
 var firstNames = ['Miguel', 'Perry', 'Herman'];
 var lastNames = ['Suay', 'Luo', 'Leung'];
@@ -12,8 +13,8 @@ module.exports = {
     up: function (queryInterface, Sequelize) {
         return queryInterface.bulkInsert('users',
             dataArray(
-                ['email', 'firstName', 'lastName', 'createdAt', 'updatedAt'],
-                [emails, firstNames, lastNames, createdAts, updatedAts]
+                ['email', 'googleId', 'firstName', 'lastName', 'createdAt', 'updatedAt'],
+                [emails, googleIds, firstNames, lastNames, createdAts, updatedAts]
             )
         );
     },
