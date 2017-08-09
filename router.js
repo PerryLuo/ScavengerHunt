@@ -3,6 +3,8 @@ const passport = require('passport');
 const client = require('./redis')
 const User = require('./models').user;
 const Hunt = require('./models').hunt;
+const Gameplay = require('./models').gameplay;
+const Player = require('./models').player;
 
 
 module.exports = (express) => {
@@ -50,18 +52,70 @@ module.exports = (express) => {
     router.post('/chosenhunt', isLoggedIn, (req, res) => {
         Hunt.findOne({
             where:{
-                name: req.body.hunt
+                id: req.body.hunt
             }
         })
         .then(function(hunt){
-            console.log(req.session.passport.user)
-            client.set('hunt'+req.session.passport.user, JSON.stringify(hunt),function(err, data){
-                if(err){
-                    return console.log(err)
-                }
+            Gameplay.create({
+                name: req.body.gamename,
+                huntId: req.body.hunt,
+                organizerId: req.session.passport.user
+            })
+            .then(function (gameData) {
+                Player.create({
+                    userId: req.session.passport.user,
+                    gameplayId: gameData.dataValues.id
+                })
+                res.json({redirect:'/playgame'})
+                // console.log(req.session.passport.user)
+                // client.set('game-'+gameData.dataValues.id, JSON.stringify(hunt),function(err, data){
+                //     if(err){
+                //         return console.log(err)
+                //     }
+                //     res.end()
+                // })
             })
         })
     });
+
+    router.post('/joingame', isLoggedIn, (req, res, next) => {
+        Gameplay.findOne({
+            where:{
+                id: req.body.joingame
+            }
+        })
+        .then(function(gameData){
+            if (!gameData) {
+                res.json({redirect:'/error'})
+            }
+            else {
+                res.json({redirect:'/playgame'})
+            }
+            // res.redirect('/playgame')
+            // client.get('game-'+gameData.dataValues.id, function(err, data){
+            //     if(err){
+            //         Hunt.findOne({
+            //             where:{
+            //                 id: gameData.dataValues.huntId
+            //             }
+            //         })
+            //         .then(function (hunt) {
+            //             // console.log(req.session.passport.user)
+            //             client.set('game-'+gameData.dataValues.id, JSON.stringify(hunt),function(err, data){
+            //                 if(err){
+            //                     return console.log(err)
+            //                 }
+            //                 res.redirect('/playgame')
+            //             })
+            //         })
+            //     }
+            //     res.redirect('/playgame')
+            // })
+        })
+        // .catch(function(err){
+        //     res.redirect('/error')
+        // })
+    })
 
     router.get('/playgame', isLoggedIn, (req, res) => {
         res.render('map')

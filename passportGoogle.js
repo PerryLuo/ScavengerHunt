@@ -13,7 +13,7 @@ module.exports = (app) => {
         clientSecret: 'JCS_ptZY7pia25QJ8SVgraPK',
         callbackURL: "http://7bbb3953.ngrok.io/auth/google/googletoken"
     }, function(accessToken, refreshToken, profile, cb) {
-        console.log(profile);
+        // console.log(profile);
         User.findOrCreate({where:{email:profile.id}
             // email: profile.id // HL: should change this to `email: ...`
         })
@@ -24,7 +24,7 @@ module.exports = (app) => {
     }));
 
     passport.serializeUser((user, done) => {
-        console.log('this is console log' + user[0])
+        // console.log('this is console log' + user[0])
         done(null, user[0].id)});
     passport.deserializeUser((id, done) => {
         User.findOne({where: {'id': id}})

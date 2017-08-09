@@ -3,52 +3,110 @@
     <h2>Game Setup</h2>
     <br>
     <hr id="hr-body">
-    <h1>Number of Players:<span id="playerNum">1</span></h1>
-    <br>
-    <button type="button" class="btn btn-danger btn-md" id="decreasePlayer">-</button>
-    <button type="button" class="btn btn-danger btn-md" id="increasePlayer">+</button>
     <script type="text/javascript">
-        var players
-        $("#increasePlayer").click(function () {
-            players = parseInt($('#playerNum').text());
-            $('#playerNum').text(players+1)
+        $(document).ready(function(){
+            $('.gameSelectionMenu').hide()
         });
-        $("#decreasePlayer").click(function () {
-            players = parseInt($('#playerNum').text())
-            $('#playerNum').text(players-1)
-        })
     </script>
 
-    <h1>Choose Your Task</h1>
-    <button type="button" class="btn btn-info btn-md" id="foodTour">Food Tour</button>
-    <button type="button" class="btn btn-info btn-md" id="walkTour">Walk Tour</button>
+    <button type="button" class="btn btn-danger btn-md" id="createGame">Create Game</button>
+    <button type="button" class="btn btn-danger btn-md" id="joinGame">Join Game</button>
     <script type="text/javascript">
-        var chosenHunt = ''
+        var chosenGameSelction = ''
+        $("#createGame").click(function () {
+            chosenGameSelction = 'Create Game'
+            $('#createGame').css("background-color", "green")
+            $('#joinGame').css("background-color", "")
+            $('#createGameMenu').show()
+            $('#joinGameMenu').hide()
+        });
+        $("#joinGame").click(function () {
+            chosenGameSelction = 'Join Game'
+            $('#joinGame').css("background-color", "green")
+            $('#createGame').css("background-color", "")
+            $('#joinGameMenu').show()
+            $('#createGameMenu').hide()
+        });
+    </script>
+</div>
+
+<div id="createGameMenu" class="gameSelectionMenu">
+    <form class="" action="index.html" method="post">
+        <h3>Create Game Name</h3>
+        <input type="text" id="gameName" placeholder="e.g. Hong Kong Hunt" value="">
+    </form>
+    <br>
+    <br>
+    <h3>Choose Your Hunt</h3>
+    <button type="button" class="btn btn-info btn-md" id="foodTour">Food Tour Hunt</button>
+    <button type="button" class="btn btn-info btn-md" id="walkTour">Walk Tour Hunt</button>
+    <script type="text/javascript">
+        var chosenHunt = 0
             $('#foodTour').click(function(){
-                chosenHunt = 'Food Tour'
+                chosenHunt = 1
             $('#foodTour').css("background-color", "red")
             $('#walkTour').css("background-color", "")
             });
             $('#walkTour').click(function(){
-                chosenHunt = 'Walk Tour'
+                chosenHunt = 2
             $('#walkTour').css("background-color", "red")
             $('#foodTour').css("background-color", "")
             });
     </script>
     <br>
     <br>
+</div>
+
+<div id="joinGameMenu" class="gameSelectionMenu">
+    <form class="" action="" method="post">
+        <h3>Enter Game ID to Join</h3>
+        <input type="text" id="joinGameVal" placeholder="Enter game ID, e.g. 1">
+    </form>
+</div>
+
+<div class="">
     <br>
-    <br>
-    <br>
-    <a href ='/gamemenu' id="returnGame" class="btn btn-primary btn-lg" role="button">Back to Game Setup</a>
+    <h2>All Set?</h2>
+    <a class="btn btn-primary btn-lg" id="playgame" role="button">Start !</a>
     <script type="text/javascript">
-            $('#returnGame').click(function(){
-                if (chosenHunt!='') {
-                        console.log('this is the hunt' + chosenHunt)
-                $.post('/chosenhunt',{hunt:chosenHunt})
+            $('#playgame').click(function(){
+                var gameName = $('#gameName').val()
+                var joinGameVal = $('#joinGameVal').val()
+                if (chosenHunt != 0) {
+                    console.log("chosenHunt"+chosenHunt)
+                    $.post('/chosenhunt',{hunt:chosenHunt, gamename:gameName})
+                    .done(function(response){
+                        window.location = response.redirect
+                    })
+                }
+                else if ( joinGameVal != 0 ) {
+                    $.post('/joingame',{joingame:joinGameVal})
+                    .done(function(response){
+                        window.location = response.redirect
+                    })
                 }
             })
     </script>
     <br>
     <br>
+    <br>
+    <hr id="hr-body">
+    <a href ='/gamemenu' id="returnGame" class="btn btn-primary btn-lg" role="button">Back to Game Setup</a>
+
+<!-- <h1>Number of Players:<span id="playerNum">1</span></h1>
+<br>
+<button type="button" class="btn btn-danger btn-md" id="decreasePlayer">-</button>
+<button type="button" class="btn btn-danger btn-md" id="increasePlayer">+</button>
+<script type="text/javascript">
+    var players
+    $("#increasePlayer").click(function () {
+        players = parseInt($('#playerNum').text());
+        $('#playerNum').text(players+1)
+    });
+    $("#decreasePlayer").click(function () {
+        players = parseInt($('#playerNum').text())
+        $('#playerNum').text(players-1)
+    })
+</script> -->
+
 </div>
