@@ -14,7 +14,7 @@ module.exports = (app) => {
         callbackURL: "http://cee4441f.ngrok.io/auth/google/googletoken"
     }, function(accessToken, refreshToken, profile, cb) {
         console.log(profile);
-        User.findOrCreate({where:{googleId:profile.id}})
+        User.findOrCreate({where:{googleId:profile.id}})  // HL: I added the column googleId 
             .then(
                 function(user) {
                     return cb(null, user);
@@ -22,7 +22,7 @@ module.exports = (app) => {
     }));
 
     passport.serializeUser((user, done) => {
-        console.log('this is console log' + user[0])
+        // console.log('this is console log' + user[0])
         done(null, user[0].id)});
     passport.deserializeUser((id, done) => {
         User.findOne({where: {'id': id}})
