@@ -46,26 +46,31 @@ options = {
     maximumAge: 0
 };
 
-function getDestTask(huntId) {
+function getDestTask() {
     if (destinationCounter >= itineraryLength) {
         $.get('/gameend');
     } else {
-        $.get('/itinerary?id=' + huntId + '&counter=' + destinationCounter, function(data){
-            destinationPosition = new google.maps.LatLng(data.destination.latitude, data.destination.longitude);
-            $('#challenge').find('p:first').html(data.task.question);
-            currentTask = data.task;
-            var destImage = 'public/art/batmancall.png';
-            if (!destMarker) {
-                destMarker = new google.maps.Marker({
-                    position: destinationPosition,
-                    map: map,
-                    icon: destImage
-                });
-            } else {
-                destMarker.setPosition(destinationPosition);
-            }
-            map.fitBounds(getZoomedOutBounds(currentPosition, destinationPosition));
-            destinationCounter++;
+        $.get('/itineraryIndex', function(data) {
+            destinationCounter = parseInt(data);
+
+            $.get('/itinerary?counter=' + destinationCounter, function(data){
+                destinationPosition = new google.maps.LatLng(data.destination.latitude, data.destination.longitude);
+                $('#challenge').find('p:first').html(data.task.question);
+                currentTask = data.task;
+                var destImage = 'public/art/batmancall.png';
+                if (!destMarker) {
+                    destMarker = new google.maps.Marker({
+                        position: destinationPosition,
+                        map: map,
+                        icon: destImage
+                    });
+                } else {
+                    destMarker.setPosition(destinationPosition);
+                }
+                map.fitBounds(getZoomedOutBounds(currentPosition, destinationPosition));
+                destinationCounter++;
+                $.post('/itineraryIndex?newIndex=' + destinationCounter);
+            });
         });
     }
 }
@@ -95,11 +100,11 @@ function initMap() {
                 draggable: true
             });
 
-            $.get('/itinerary?id=' + huntId, function(data){
+            $.get('/itinerary', function(data){
                 itineraryLength = parseInt(data);
             });
 
-            getDestTask(huntId);
+            getDestTask();
 
             var service = new google.maps.places.PlacesService(map);
 
@@ -187,6 +192,7 @@ function checkAnswer() {
             $('#score').css('z-index', '-1');
         }, 4000);
         getDestTask(huntId);
+        currentChallenge = 0;
     } else {
         console.log("wrong answer!");
         var tries = parseInt($('#tries').text());
@@ -208,7 +214,7 @@ function checkAnswer() {
 
 function giveUp(){
     closeChallenge();
-    $('#tries').text('3');
+    $('#tries').html('3');
     $('#score>h1').html("You gave up?! Oh well, next destination.");
     $('#score').css('z-index', '1');
     setTimeout(function(){
@@ -216,4 +222,5 @@ function giveUp(){
         $('#score').css('z-index', '-1');
     }, 4000);
     getDestTask(huntId);
+    currentChallenge = 0;
 }

@@ -51,6 +51,6 @@
 <!-- <script src="js/script.js"></script> -->
 <script src="public/js/index.js"></script>
 <script>
-    huntId = {{#hunt}}{{huntId}}{{/hunt}};
+    {{#hunt}}{{#if huntId}}huntId = {{huntId}};{{else}}{{/if}}{{/hunt}}
     initMap();
 </script>

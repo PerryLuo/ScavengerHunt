@@ -9,12 +9,12 @@ module.exports = function(sequelize, DataTypes) {
         durationHours: DataTypes.FLOAT,
         playStatus: {
             type: DataTypes.STRING,
-            validate: {
-                isIn: {
-                    args: ['unstarted', 'ongoing', 'ended'],
-                    msg: "Please enter 'unstarted', 'ongoin', or 'ended'"
-                }
-            }
+            // validate: {
+            //     isIn: {
+            //         args: ['unstarted', 'ongoing', 'ended'],
+            //         msg: "Please enter 'unstarted', 'ongoing', or 'ended'"
+            //     }
+            // }
         }
     });
     gameplay.associate = function(models) {
