@@ -48,7 +48,7 @@ options = {
 
 function getDestTask() {
     if (destinationCounter >= itineraryLength) {
-        $.get('/gameend');
+        window.location = '/gameend';
     } else {
         $.get('/itineraryIndex', function(data) {
             destinationCounter = parseInt(data);

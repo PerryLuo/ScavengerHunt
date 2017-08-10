@@ -13,22 +13,21 @@ module.exports = (app) => {
         clientSecret: 'z-xgz8YLUoKjgk7E2M98HSyb',
         callbackURL: "http://cee4441f.ngrok.io/auth/google/googletoken"
     }, function(accessToken, refreshToken, profile, cb) {
-        console.log(profile);
-        User.findOrCreate({where:{googleId:profile.id}})  // HL: I added the column googleId 
-            .then(
-                function(user) {
-                    return cb(null, user);
-                });
+        User.findOrCreate({
+            where:{googleId:profile.id}
+        })
+        .then( user => cb(null, user));
     }));
 
-    passport.serializeUser((user, done) => {
-        // console.log('this is console log' + user[0])
-        done(null, user[0].id)});
+    passport.serializeUser((user, done) => done(null, user[0].id));
+
     passport.deserializeUser((id, done) => {
-        User.findOne({where: {'id': id}})
-            .then(user => {
-                if (user === null) done(new Error('Wrong user id.'));
-                done(null, user);
-            });
+        User.findOne({
+            where: {'id': id}
+        })
+        .then(user => {
+            if (user === null) done(new Error('Wrong user id.'));
+            done(null, user);
+        });
     });
 };

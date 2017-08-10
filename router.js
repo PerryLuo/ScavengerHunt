@@ -1,6 +1,5 @@
 //router.js
 const passport = require('passport');
-const client = require('./redis')
 const User = require('./models').user;
 const Hunt = require('./models').hunt;
 const Destination = require('./models').destination;
@@ -31,12 +30,10 @@ module.exports = (express) => {
         res.render('login');
     });
 
-    router.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
-
+    router.get('/auth/google', passport.authenticate('google', {scope: ['profile']}));
     router.get('/auth/google/googletoken',
         passport.authenticate('google', { failureRedirect: '/login' }),
         function(req, res) {
-            // Successful authentication, redirect home.
             res.redirect('/gamemenu');
       });
 
@@ -48,182 +45,236 @@ module.exports = (express) => {
         res.render('gamesetup');
     });
 
-    router.post('/chosenhunt', isLoggedIn, (req, res) => {
+    router.post('/creategame', isLoggedIn, (req, res) => {
         Hunt.findOne({
-            where:{
-                id: req.body.hunt
-            }
+            where:{id: req.body.hunt}
         })
         .then( hunt => {
-            req.session.huntId = hunt.id; // Save huntId to session
             Gameplay.create({
                 name: req.body.gamename,
                 huntId: req.body.hunt,
                 organizerId: req.session.passport.user,
-                playStatus: 'ongoing'
+                playStatus: 'unstarted'
             })
-            .then( gameData => {
-                req.session.gameplayId = gameData.dataValues.id;  // Save gameplayId to session
+            .then(gameplay => {
                 Player.create({
                     userId: req.session.passport.user,
-                    gameplayId: gameData.dataValues.id,
+                    gameplayId: gameplay.dataValues.id,
                     score: 0,
                     itineraryIndex: 0
-                }).then( playerData => {
-                    req.session.playerId = playerData.dataValues.id; // Save playerId to session
-                    res.json({redirect:'/playgame'});
                 });
-                // console.log(req.session.passport.user)
-                // client.set('game-'+gameData.dataValues.id, JSON.stringify(hunt),function(err, data){
-                //     if(err){
-                //         return console.log(err)
-                //     }
-                //     res.end()
-                // })
+                res.json({gameplayId: gameplay.dataValues.id});
             });
         }).catch(err => console.log(err));
     });
 
-    router.post('/joingame', isLoggedIn, (req, res, next) => {
-        Gameplay.findOne({
+    router.get('/configureGame', isLoggedIn, (req, res) => {
+
+        Gameplay.findAll({
             where:{
-                id: req.body.joingame
+                organizerId: req.session.passport.user,
+                $or:[
+                    {playStatus: {$eq: 'unstarted'}},
+                    {playStatus: {$eq: 'ongoing'}}
+                ]
+            },
+            include: [{model: Player, include: [User]}]
+        })
+        .then(function (unstartedGame) {
+            console.log(unstartedGame[0]);
+            var unstartedgame = unstartedGame.map(function(data){
+                return {
+                    name: data.dataValues.name,
+                    id: data.dataValues.id,
+                    playersNames: (data.dataValues.players.map( each => {
+                        return each.dataValues.user.dataValues.firstName + ' ' + each.dataValues.user.dataValues.lastName;
+                    })).join(', ')
+                };
+            });
+            res.json(unstartedgame);
+        });
+    });
+
+    router.post('/playstatus', isLoggedIn, (req, res) => {
+        Gameplay.update({
+            playStatus: req.body.playStatus,
+        }, {
+            where: {
+                organizerId: req.session.passport.user,
+                name: req.body.gamename
             }
         })
-        .then(function(gameData){
-            if (!gameData || gameData.dataValues.playStatus !== 'ongoing') {
-                res.json({redirect:'/error'});
+        .then( game => {
+            console.log(game);
+        });
+    });
+
+    router.post('/joingame', isLoggedIn, (req, res) => {
+        var status = 'invalid';
+        var alert = '';
+        Gameplay.findOne({
+            where: {id: req.body.joingame}
+        })
+        .then(function(gameData){ // NOTE: actually still need to check if player is already in game
+            if (!gameData) {
+                alert = "Invalid game id";
+            } else if (gameData.dataValues.playStatus === 'ended') {
+                alert = "Game has ended and can no longer be joined";
+            } else if (gameData.dataValues.playStatus === 'unstarted') {
+                status = 'valid';
+                alert = "You have (already) joined '" + gameData.dataValues.name +
+                        "', but it hasn't begun yet! <br>Click 'Start Game' to see \
+                        the games you have joined and to enter one that has begun.";
+            } else if (gameData.dataValues.playStatus === 'ongoing') {
+                status = 'valid';
+                alert = "You have (already) joined '" + gameData.dataValues.name +
+                        "', and it has already begun! <br>Click 'Start Game', find \
+                        your game, and click on it to enter the game.";
             }
-            else if (gameData.dataValues.playStatus !== 'ended') {
-                Player.create({
+            if (status === 'valid') {
+                Player.findOrCreate({where: {
                     userId: req.session.passport.user,
                     gameplayId: gameData.dataValues.id,
                     score: 0,
                     itineraryIndex: 0,
-                });
-                res.json({redirect:'/playgame'});
+                }});
             }
-            // res.redirect('/playgame')
-            // client.get('game-'+gameData.dataValues.id, function(err, data){
-            //     if(err){
-            //         Hunt.findOne({
-            //             where:{
-            //                 id: gameData.dataValues.huntId
-            //             }
-            //         })
-            //         .then(function (hunt) {
-            //             // console.log(req.session.passport.user)
-            //             client.set('game-'+gameData.dataValues.id, JSON.stringify(hunt),function(err, data){
-            //                 if(err){
-            //                     return console.log(err)
-            //                 }
-            //                 res.redirect('/playgame')
-            //             })
-            //         })
-            //     }
-            //     res.redirect('/playgame')
-            // })
+        })
+        .then(() => {
+            res.json({alert: alert});
+        }).catch(err => console.log(err));
+    });
+
+    router.get('/viewgames', isLoggedIn, (req, res) => {
+        Player.findAll({
+            where: {userId: req.session.passport.user}
+        })
+        .then(function(players){
+            var gameplayIds = players.map(function(data){
+                return data.dataValues.gameplayId;
+            });
+            Gameplay.findAll({
+                where: {id: gameplayIds},
+                include: [{model: Hunt},{model: Player}]
+            })
+            .then(function(gameplay){
+                console.log(gameplay[0].dataValues.hunt);
+                console.log(gameplay[0].dataValues.players);
+                var game = gameplay.map(function(data){
+                    return {
+                        name: data.dataValues.name,
+                        playStatus: data.dataValues.playStatus,
+                        gameplayId: data.dataValues.id,
+                        huntId: data.dataValues.hunt.dataValues.id,
+                        playerId: data.dataValues.players[0].dataValues.id
+                    };
+                });
+                res.json(game);
+            });
         });
-        // .catch(function(err){
-        //     res.redirect('/error')
-        // })
     });
 
     router.get('/playgame', isLoggedIn, (req, res) => {
-        // client.set(req.)
-        res.render('map')
+        console.log("I was requested!");
+        req.session.gameplayId = req.query.gameplayId;
+        req.session.huntId = req.query.huntId;
+        req.session.playerId = req.query.playerId;
+        res.json({redirect:'/map'});
     });
 
     // Keep this for development
-    router.get('/map', (req, res) => {
-        //console.log(req.session);
-        Hunt.findOne({where:{id: req.session.huntId}})
-            .then( hunt => {
-                res.render('map', {hunt: {huntId: hunt.id}});
-            });
+    router.get('/map', isLoggedIn, (req, res) => {
+        res.render('map');
     });
 
     /* Database queries via jQuery */
 
     // Get player's current itinerary index (gameplay progress)
-    router.get('/itineraryIndex', (req, res) => {
-        Player.findOne({where: {
-            id: req.session.playerId
-        }})
+    router.get('/itineraryIndex', isLoggedIn, (req, res) => {
+        Player.findOne({
+            where: {id: req.session.playerId}
+        })
         .then( player => {
             res.send(player.itineraryIndex.toString());
         }).catch(function(err){console.log(err);});
     });
 
     // Update player's itinerary index (gameplay progress)
-    router.post('/itineraryIndex', (req, res) => {
+    router.post('/itineraryIndex', isLoggedIn, (req, res) => {
         var newIndex = req.query.newIndex;
         Player.update({
             itineraryIndex: newIndex
-        },{
+        }, {
             where: {id: req.session.playerId}
-        })
-        .catch(function(err){console.log(err);});
+        }).catch(function(err){console.log(err);});
     });
 
     // Get player's destination/task
-    router.get('/itinerary', (req, res) => {
+    router.get('/itinerary', isLoggedIn, (req, res) => {
         var huntId = req.session.huntId; // NOTE: Replace with req.session.huntId
         var counter = parseInt(req.query.counter);
         if (isNaN(counter)) {
-            Hunt.findOne({where:{id: huntId}})
-                .then( hunt => {
-                    res.send((hunt.itinerary.length).toString());
-                }).catch(function(err){console.log(err);});
+            Hunt.findOne({
+                where:{id: huntId}
+            })
+            .then( hunt => {
+                res.send((hunt.itinerary.length).toString());
+            }).catch( err => console.log(err));
         } else {
             var destinationId, taskId, destination, task;
-            Hunt.findOne({where:{id: huntId}})
-                .then( hunt => {
-                    destinationId = hunt.itinerary[counter][0];
-                    taskId = hunt.itinerary[counter][1];
+            Hunt.findOne({
+                where: {id: huntId}
+            })
+            .then( hunt => {
+                if (counter >= hunt.itinerary.length) {
+                    res.redirect('/gameend');
+                }
+                destinationId = hunt.itinerary[counter][0];
+                taskId = hunt.itinerary[counter][1];
+            })
+            .then(() => {
+                Destination.findOne({
+                    where: {id: destinationId}
+                })
+                .then(function(result){
+                    destination = result;
                 })
                 .then(() => {
-                    Destination.findOne({where: {id: destinationId}})
-                        .then(function(result){
-                            destination = result;
-                        })
-                        .then(() => {
-                            Task.findOne({where: {id: taskId}})
-                                .then(function(result){
-                                    task = result;
-                                    res.send({destination:destination, task:task});
-                                });
-                        });
-                })
-                .catch( err => console.log(err));
+                    Task.findOne({
+                        where: {id: taskId}
+                    })
+                    .then( result => {
+                        task = result;
+                        res.send({destination:destination, task:task});
+                    });
+                });
+            }).catch( err => console.log(err));
         }
     });
 
     // Score update
-    router.post('/updatescore', (req, res) => {
+    router.post('/updatescore', isLoggedIn, (req, res) => {
         var addScore = req.query.add;
         Player.findOne({where: {
             id: req.session.playerId
-            // gameplayId: '1', // NOTE: Replace with req.session.gameplayId
-            // userId: '1' // NOTE: Replace with req.session.userId
         }})
         .then( player => {
             Player.update({
                 score: parseInt(player.score) + parseInt(addScore)
             }, {
-                where:{
-                    id: req.session.playerId
-                    // gameplayId: '1', // NOTE: Need to change this into a variable
-                    // userId: '1' // NOTE: Need to change this into a variable
-                }
+                where: {id: req.session.playerId}
             });
         })
         .catch( err => console.log(err));
     });
 
-    router.get('/gameend', (req, res) => {
-        req.session.gameplayId = 1; // testing only; delete this when deploying
-        var scores, itineraryIndices, ended = false;
+    router.get('/gameend', isLoggedIn, (req, res) => {
+        var scores, itineraryIndices, endeds = {};
+        if (req.query) {
+            req.session.gameplayId = req.query.gameplayId;
+            req.session.huntId = req.query.huntId;
+            req.session.playerId = req.query.playerId;
+        }
         Player.findAll({
             where: {gameplayId: req.session.gameplayId},
             include: [{model: User}]
@@ -240,34 +291,37 @@ module.exports = (express) => {
             itineraryIndices = players.map(item => item.itineraryIndex);
         })
         .then(() => {
-            Gameplay.findOne({where:{id: req.session.gameplayId}})
-                .then( gameplay => {
-                    if (gameplay.playStatus === 'ended') {
-                        scores[0].winner = 'Y';
-                        ended = true;
-                    } else if (gameplay.playStatus === 'ongoing') {
-                        // If all players finished all destinations/tasks
-                        Hunt.findOne({id: req.session.huntId})
-                            .then( hunt => {
-                                var itineraryLength = hunt.itinerary.length;
-                                var indexSet = new Set(itineraryIndices.map(index => {
-                                    return index >= itineraryLength;
-                                }));
-                                if (indexSet.size === 1 & indexSet.has(true)) {
-                                    Gameplay.update(
-                                        {playStatus: 'ended'},
-                                        {where:{id: req.session.gameplayId}}
-                                    );
-                                    scores[0].winner = 'Y';
-                                    ended = true;
-                                }
-                            });
-                    }
-                });
+            Gameplay.findOne({
+                where:{id: req.session.gameplayId}
+            })
+            .then( gameplay => {
+                if (gameplay.playStatus === 'ended') {
+                    scores[0].winner = 'Y';
+                    endeds.ended = true;
+                } else if (gameplay.playStatus === 'ongoing') {
+                    // If all players finished all destinations/tasks
+                    Hunt.findOne({
+                        id: req.session.huntId
+                    })
+                    .then( hunt => {
+                        var itineraryLength = hunt.itinerary.length;
+                        var indexSet = new Set(itineraryIndices.map(index => {
+                            return index >= itineraryLength;
+                        }));
+                        if (indexSet.size === 1 & indexSet.has(true)) {
+                            Gameplay.update(
+                                {playStatus: 'ended'},
+                                {where:{id: req.session.gameplayId}}
+                            );
+                            scores[0].winner = 'Y';
+                            endeds.ended = true;
+                        }
+                    });
+                }
+            });
         })
         .then(() => {
-            //scores[0].winner = 'Y'; // delete this later
-            res.render('gameend', {scores: scores, endeds: [{ended: ended}]});
+            res.render('gameend', {scores: scores, endeds: endeds});
         })
         .catch( err => console.log(err));
     });

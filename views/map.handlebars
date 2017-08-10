@@ -3,7 +3,7 @@
 <div id="myNav" class="overlay">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     <div class="overlay-content">
-        <a href="#">Game Settings</a>
+        <a href="/gamesetup">Game Settings</a>
         <a href="#">Sound Effects</a>
         <a href="#">About</a>
         <a href="#">Exit</a>
@@ -43,14 +43,11 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5VPdkr79bv-_2TnnwoFXhZgHF2ztZycg&libraries=geometry,places"></script>
     <!-- PL API key = AIzaSyAOxhOC9pjODy1pcnKNzijSqHLncZNVagQ -->
     <!-- HL API key = AIzaSyA5VPdkr79bv-_2TnnwoFXhZgHF2ztZycg -->
-    <!-- HL: Deleted `async defer` because our js files depend on the
-             `google` and `google.maps` objects to load completely first -->
 <script src="public/js/mapLayout.js"></script>
 <script src="public/js/zoomOut.js"></script>
 <script src="public/js/arrow.js"></script>
-<!-- <script src="js/script.js"></script> -->
 <script src="public/js/index.js"></script>
 <script>
-    {{#hunt}}{{#if huntId}}huntId = {{huntId}};{{else}}{{/if}}{{/hunt}}
+    // {{#hunt}}{{#if huntId}}huntId = {{huntId}};{{else}}{{/if}}{{/hunt}}
     initMap();
 </script>
