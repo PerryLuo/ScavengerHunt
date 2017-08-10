@@ -10,22 +10,54 @@
     </script>
 
     <button type="button" class="btn btn-danger btn-md" id="createGame">Create Game</button>
+    <button type="button" class="btn btn-danger btn-md" id="configureGame">Configure Game</button>
     <button type="button" class="btn btn-danger btn-md" id="joinGame">Join Game</button>
+    <button type="button" class="btn btn-danger btn-md" id="startGame">Start Game</button>
     <script type="text/javascript">
         var chosenGameSelction = ''
         $("#createGame").click(function () {
             chosenGameSelction = 'Create Game'
             $('#createGame').css("background-color", "green")
+            $('#configureGame').css("background-color", "")
             $('#joinGame').css("background-color", "")
+            $('#startGame').css("background-color", "")
             $('#createGameMenu').show()
+            $('#configureGameMenu').hide()
             $('#joinGameMenu').hide()
+            $('#startGameMenu').hide()
+        });
+        $("#configureGame").click(function () {
+            chosenGameSelction = 'Configure Game'
+            $('#createGame').css("background-color", "")
+            $('#configureGame').css("background-color", "green")
+            $('#joinGame').css("background-color", "")
+            $('#startGame').css("background-color", "")
+            $('#createGameMenu').hide()
+            $('#configureGameMenu').show()
+            $('#joinGameMenu').hide()
+            $('#startGameMenu').hide()
         });
         $("#joinGame").click(function () {
             chosenGameSelction = 'Join Game'
-            $('#joinGame').css("background-color", "green")
             $('#createGame').css("background-color", "")
-            $('#joinGameMenu').show()
+            $('#configureGame').css("background-color", "")
+            $('#joinGame').css("background-color", "green")
+            $('#startGame').css("background-color", "")
             $('#createGameMenu').hide()
+            $('#configureGameMenu').hide()
+            $('#joinGameMenu').show()
+            $('#startGameMenu').hide()
+        });
+        $("#startGame").click(function () {
+            chosenGameSelction = 'Play Game'
+            $('#createGame').css("background-color", "")
+            $('#configureGame').css("background-color", "")
+            $('#joinGame').css("background-color", "")
+            $('#startGame').css("background-color", "green")
+            $('#createGameMenu').hide()
+            $('#configureGameMenu').hide()
+            $('#joinGameMenu').hide()
+            $('#startGameMenu').show()
         });
     </script>
 </div>
@@ -57,11 +89,85 @@
     <br>
 </div>
 
+<div id="configureGameMenu" class="gameSelectionMenu">
+    <script type="text/javascript">
+        $('#configureGame').click(function(){
+            $.get('/configureGame', function () {
+            })
+            .done(function(unstartedgame){
+                $('#configureGameMenu').html('')
+                $('#configureGameMenu').append(function () {
+                    var namesUnstartedGame = '<br><br><ol>'
+                    unstartedgame.forEach(function (name) {
+                        namesUnstartedGame += '<li>'+name+'</li><button type="button" class="btn btn-info btn-xs ActivateGame" id="ActivateGame-'+name+'">Activate Game</button><button type="button" class="btn btn-info btn-xs EndGame" id="EndGame-'+name+'">End Game</button>'
+                    })
+                    namesUnstartedGame += '</ol>'
+                    return namesUnstartedGame;
+                })
+                playStatus()
+            })
+        })
+    </script>
+</div>
+
+
+<div class="">
+    <script type="text/javascript">
+    function playStatus() {
+        var gameStatus = ''
+        var gameName = ''
+        $('.ActivateGame').click(function(){
+            gameName = this.id.split('-')[1]
+            gameStatus = 'ongoing'
+            $.post('/playstatus',{playStatus:gameStatus, gamename:gameName})
+        })
+        $('.EndGame').click(function(){
+            gameName = this.id.split('-')[1]
+            gameStatus = 'ended'
+            $.post('/playstatus',{playStatus:gameStatus, gamename:gameName})
+        })
+    }
+    </script>
+</div>
+
 <div id="joinGameMenu" class="gameSelectionMenu">
     <form class="" action="" method="post">
         <h3>Enter Game ID to Join</h3>
         <input type="text" id="joinGameVal" placeholder="Enter game ID, e.g. 1">
     </form>
+</div>
+
+<div id="startGameMenu" class="gameSelectionMenu">
+    <script type="text/javascript">
+        $('#startGame').click(function(){
+            $.get('/startgame', function () {
+            })
+            .done(function(game){
+                $('#startGameMenu').html('')
+                $('#startGameMenu').append(function () {
+                    var gameStart = '<br><br><ol>';
+                    game.forEach(function (obj) {
+                        if (obj.playStatus === 'ongoing') {
+                            gameStart += '<li>'+obj.name+'</li><button type="button" class="btn btn-info btn-xs startOngoingGame" id="start-'+obj.name+'">Start Game</button>';
+                        } else {
+                            gameStart += '<li>'+obj.name+'</li><button type="button" class="btn btn-link btn-xs disabled" id="ActivateGame-'+obj.name+'">Game Not Open</button>';
+                        }
+                    })
+                    gameStart += '</ol>';
+                    return gameStart;
+                })
+                // play()
+            })
+        })
+    </script>
+</div>
+
+<div class="">
+    <script type="text/javascript">
+        $("#startGameMenu").on('click', '.startOngoingGame',function(){
+            window.location.replace('/playgame')
+        })
+    </script>
 </div>
 
 <div class="">
@@ -93,6 +199,7 @@
     <hr id="hr-body">
     <a href ='/gamemenu' id="returnGame" class="btn btn-primary btn-lg" role="button">Back to Game Setup</a>
 
+<!-- this section is for adding number of players when "team" feature is added -->
 <!-- <h1>Number of Players:<span id="playerNum">1</span></h1>
 <br>
 <button type="button" class="btn btn-danger btn-md" id="decreasePlayer">-</button>

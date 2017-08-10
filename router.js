@@ -60,7 +60,8 @@ module.exports = (express) => {
             Gameplay.create({
                 name: req.body.gamename,
                 huntId: req.body.hunt,
-                organizerId: req.session.passport.user
+                organizerId: req.session.passport.user,
+                playStatus: 'ongoing'
             })
             .then(function (gameData) {
                 Player.create({
@@ -68,6 +69,7 @@ module.exports = (express) => {
                     gameplayId: gameData.dataValues.id
                 })
                 res.json({redirect:'/playgame'})
+                //this section is for storing game data in redis rather than in server
                 // console.log(req.session.passport.user)
                 // client.set('game-'+gameData.dataValues.id, JSON.stringify(hunt),function(err, data){
                 //     if(err){
@@ -79,19 +81,67 @@ module.exports = (express) => {
         })
     });
 
-    router.post('/joingame', isLoggedIn, (req, res, next) => {
+    router.get('/configureGame', isLoggedIn, (req, res) => {
+        Gameplay.findAll({
+            where:{
+                organizerId: req.session.passport.user,
+                $or:[
+                    {
+                        playStatus:
+                        {
+                            $eq: 'unstarted'
+                        }
+                    },
+                    {
+                        playStatus:
+                        {
+                            $eq: 'ongoing'
+                        }
+                    }
+                ]
+            }
+        })
+        .then(function (unstartedGame) {
+            console.log(unstartedGame[0])
+            var unstartedgame = unstartedGame.map(function(data){
+                return data.dataValues.name;
+            })
+            res.json(unstartedgame)
+        })
+    });
+
+    router.post('/playstatus', isLoggedIn, (req, res) => {
+        Gameplay.update({
+            playStatus:req.body.playStatus,
+            },
+                {
+                    where:{
+                        organizerId: req.session.passport.user,
+                        name: req.body.gamename
+                    }
+                }
+        )
+        .then(function (game) {
+            console.log(game)
+        })
+    });
+
+    router.post('/joingame', isLoggedIn, (req, res) => {
         Gameplay.findOne({
             where:{
                 id: req.body.joingame
             }
         })
         .then(function(gameData){
-            if (!gameData) {
+            console.log(gameData)
+            if (!gameData || gameData.dataValues.playStatus!=='ongoing') {
                 res.json({redirect:'/error'})
             }
-            else {
+            else if (gameData.dataValues.playStatus=='ongoing') {
                 res.json({redirect:'/playgame'})
             }
+            //unstarted, ongoing, ended
+            //this section is for calling game data in redis rather than in server
             // res.redirect('/playgame')
             // client.get('game-'+gameData.dataValues.id, function(err, data){
             //     if(err){
@@ -118,9 +168,37 @@ module.exports = (express) => {
         // })
     })
 
+    router.get('/startgame', isLoggedIn, (req, res) => {
+        Player.findAll({
+            where:{
+                userId:req.session.passport.user
+            }
+        })
+        .then(function(players){
+            var gameplayIds = players.map(function(data){
+                return data.dataValues.gameplayId
+            });
+            console.log('gameplayid-'+gameplayIds)
+            Gameplay.findAll({
+                where: {
+                    id: gameplayIds
+                }
+            })
+            .then(function(gameIds){
+                var game = gameIds.map(function(data){
+                    return {name: data.dataValues.name, playStatus: data.dataValues.playStatus};
+                });
+                res.json(game)
+            });
+        });
+    });
+
     router.get('/playgame', isLoggedIn, (req, res) => {
         // client.set(req.)
-        res.render('map')
+        Hunt.findOne({where:{id:1}})
+            .then(function(hunt){
+                res.render('map', {hunt: {huntId: hunt.id}});
+            });
     });
 
     // Keep this for development
