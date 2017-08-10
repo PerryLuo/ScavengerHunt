@@ -19,6 +19,9 @@ module.exports = {
             score: {
                 type: Sequelize.INTEGER
             },
+            itineraryIndex: {
+                type: Sequelize.INTEGER
+            },
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE

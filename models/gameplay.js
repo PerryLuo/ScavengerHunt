@@ -5,7 +5,17 @@ module.exports = function(sequelize, DataTypes) {
         huntId: DataTypes.INTEGER,
         organizerId: DataTypes.INTEGER,
         startTime: DataTypes.DATE,
-        endTime: DataTypes.DATE
+        endTime: DataTypes.DATE,
+        durationHours: DataTypes.FLOAT,
+        playStatus: {
+            type: DataTypes.STRING,
+            validate: {
+                isIn: {
+                    args: ['unstarted', 'ongoing', 'ended'],
+                    msg: "Please enter 'unstarted', 'ongoin', or 'ended'"
+                }
+            }
+        }
     });
     gameplay.associate = function(models) {
         gameplay.belongsTo(models.hunt, {foreignKey: 'huntId'});

@@ -25,6 +25,12 @@ module.exports = {
             endTime: {
                 type: Sequelize.DATE
             },
+            durationHours: {
+                type: Sequelize.FLOAT
+            },
+            playStatus: {
+                type: Sequelize.STRING,
+            },
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE

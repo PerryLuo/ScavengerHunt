@@ -5,6 +5,7 @@ module.exports = function(sequelize, DataTypes) {
         gameplayId: DataTypes.INTEGER,
         teamId: DataTypes.INTEGER,
         score: DataTypes.INTEGER,
+        itineraryIndex: DataTypes.INTEGER
     });
     player.associate = function(models) {
         player.belongsTo(models.user, {foreignKey: 'userId'});
