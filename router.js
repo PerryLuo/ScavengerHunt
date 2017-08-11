@@ -211,7 +211,7 @@ module.exports = (express) => {
 
     // Get player's destination/task
     router.get('/itinerary', isLoggedIn, (req, res) => {
-        var huntId = req.session.huntId; // NOTE: Replace with req.session.huntId
+        var huntId = req.session.huntId; 
         var counter = parseInt(req.query.counter);
         if (isNaN(counter)) {
             Hunt.findOne({
@@ -275,7 +275,7 @@ module.exports = (express) => {
             playerId: req.session.playerId
         };
         var scores, itineraryIndices, endeds = {};
-        if (req.query) {
+        if (req.query.gameplayId) {
             ge.gameplayId = req.query.gameplayId;
             ge.huntId = req.query.huntId;
             ge.playerId = req.query.playerId;
@@ -297,7 +297,7 @@ module.exports = (express) => {
         })
         .then(function() {
             Gameplay.findOne({
-                where:{id: ge.gameplayId}
+                where: {id: ge.gameplayId}
             })
             .then(function(gameplay) {
                 console.log('LALALALA: ' + gameplay);
