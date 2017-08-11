@@ -9,6 +9,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    text-align: center;
 }
 
 a[href^="http://maps.google.com/maps"]{display: none !important}
@@ -91,6 +92,7 @@ a[href^="https://maps.google.com/maps"]{display: none !important}
 #menuSpan {
     position:fixed;
     z-index: 1;
+    display:block;
 }
 
 /* CSS for the challenges window */
@@ -153,6 +155,11 @@ a[href^="https://maps.google.com/maps"]{display: none !important}
 .badge-winner {
     background-color: #d2f0ff;
     color: #359fd4;
+}
+/*Color for the challenge*/
+form p {
+  color: #001f3f;
+  font-size: 18px;
 }
 
 
