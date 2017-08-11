@@ -126,7 +126,7 @@
                             '</button>&nbsp;' +
                             '<button type="button" class="btn btn-info btn-xs EndGame" id="EndGame-'+obj.name+'">' +
                                 'End Game' +
-                            '</button><br><br>';
+                            '</button><br><br><div id="configureActionResponse"></div>';
                     });
                     namesUnstartedGame += '</ol>';
                     return namesUnstartedGame;
@@ -146,12 +146,18 @@
         $('.ActivateGame').click(function(){
             gameName = this.id.split('-')[1];
             gameStatus = 'ongoing';
-            $.post('/playstatus',{playStatus:gameStatus, gamename:gameName});
+            $.post('/playstatus',{playStatus:gameStatus, gamename:gameName})
+            .done(function(){
+                $('#configureGameMenu').append('<h5><i>' + gameName + '</i> has been activated! Players who have joined can enter the game in \'View Games\'.</h5>')
+            });
         });
         $('.EndGame').click(function(){
             gameName = this.id.split('-')[1];
             gameStatus = 'ended';
-            $.post('/playstatus',{playStatus:gameStatus, gamename:gameName});
+            $.post('/playstatus',{playStatus:gameStatus, gamename:gameName})
+            .done(function(){
+                $('#configureGameMenu').append('<h5><i>' + gameName + '</i> has been deactivated! Players can no longer enter the game.</h5>')
+            });
         });
     }
     </script>

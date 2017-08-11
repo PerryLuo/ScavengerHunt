@@ -9,8 +9,8 @@ module.exports = (app) => {
     app.use(passport.session());
 
     passport.use(new GoogleStrategy({
-        clientID: '530099490791-e13gnvdek6bv6ftlcovuga493jrnrso2.apps.googleusercontent.com',
-        clientSecret: 'z-xgz8YLUoKjgk7E2M98HSyb',
+        clientID: '228636638343-iamabdia4r5rj2ahfnb3nm0upe92rpqa.apps.googleusercontent.com',
+        clientSecret: 'SZib7Cs_6uRlvTjIGBbefLhh',
         callbackURL: "http://cee4441f.ngrok.io/auth/google/googletoken"
     }, function(accessToken, refreshToken, profile, cb) {
         User.findOrCreate({
