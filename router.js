@@ -105,7 +105,7 @@ module.exports = (express) => {
             }
         })
         .then( game => {
-            console.log(game);
+            res.send('done');
         });
     });
 
@@ -211,7 +211,7 @@ module.exports = (express) => {
 
     // Get player's destination/task
     router.get('/itinerary', isLoggedIn, (req, res) => {
-        var huntId = req.session.huntId; // NOTE: Replace with req.session.huntId
+        var huntId = req.session.huntId; 
         var counter = parseInt(req.query.counter);
         if (isNaN(counter)) {
             Hunt.findOne({
@@ -269,14 +269,19 @@ module.exports = (express) => {
     });
 
     router.get('/gameend', isLoggedIn, (req, res) => {
+        var ge = {
+            gameplayId: req.session.gameplayId,
+            huntId: req.session.huntId,
+            playerId: req.session.playerId
+        };
         var scores, itineraryIndices, endeds = {};
-        if (req.query) {
-            req.session.gameplayId = req.query.gameplayId;
-            req.session.huntId = req.query.huntId;
-            req.session.playerId = req.query.playerId;
+        if (req.query.gameplayId) {
+            ge.gameplayId = req.query.gameplayId;
+            ge.huntId = req.query.huntId;
+            ge.playerId = req.query.playerId;
         }
         Player.findAll({
-            where: {gameplayId: req.session.gameplayId},
+            where: {gameplayId: ge.gameplayId},
             include: [{model: User}]
         })
         .then(function(players){
@@ -290,28 +295,29 @@ module.exports = (express) => {
             scores = scores.sort((a, b) => {return a.score < b.score;});
             itineraryIndices = players.map(item => item.itineraryIndex);
         })
-        .then(() => {
+        .then(function() {
             Gameplay.findOne({
-                where:{id: req.session.gameplayId}
+                where: {id: ge.gameplayId}
             })
-            .then( gameplay => {
+            .then(function(gameplay) {
+                console.log('LALALALA: ' + gameplay);
                 if (gameplay.playStatus === 'ended') {
                     scores[0].winner = 'Y';
                     endeds.ended = true;
                 } else if (gameplay.playStatus === 'ongoing') {
                     // If all players finished all destinations/tasks
                     Hunt.findOne({
-                        id: req.session.huntId
+                        id: ge.huntId
                     })
-                    .then( hunt => {
+                    .then(function(hunt) {
                         var itineraryLength = hunt.itinerary.length;
-                        var indexSet = new Set(itineraryIndices.map(index => {
+                        var indexSet = new Set(itineraryIndices.map(function(index) {
                             return index >= itineraryLength;
                         }));
                         if (indexSet.size === 1 & indexSet.has(true)) {
                             Gameplay.update(
                                 {playStatus: 'ended'},
-                                {where:{id: req.session.gameplayId}}
+                                {where:{id: ge.gameplayId}}
                             );
                             scores[0].winner = 'Y';
                             endeds.ended = true;
@@ -320,10 +326,10 @@ module.exports = (express) => {
                 }
             });
         })
-        .then(() => {
+        .then(function() {
             res.render('gameend', {scores: scores, endeds: endeds});
         })
-        .catch( err => console.log(err));
+        .catch(function(err) {console.log(err);});
     });
 
 // below code is for reference only

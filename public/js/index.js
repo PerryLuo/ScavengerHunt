@@ -55,7 +55,7 @@ function getDestTask() {
 
             $.get('/itinerary?counter=' + destinationCounter, function(data){
                 destinationPosition = new google.maps.LatLng(data.destination.latitude, data.destination.longitude);
-                $('#challenge').find('p:first').html(data.task.question);
+                $('#challenge').find('p:first').html('<h3>You\'ve arrived at ' + data.destination.name +'!</h3><p>' + data.task.question + '</p><br>');
                 currentTask = data.task;
                 var destImage = 'public/art/batmancall.png';
                 if (!destMarker) {
@@ -102,9 +102,9 @@ function initMap() {
 
             $.get('/itinerary', function(data){
                 itineraryLength = parseInt(data);
+            }).done(function(){
+                getDestTask();
             });
-
-            getDestTask();
 
             var service = new google.maps.places.PlacesService(map);
 
