@@ -9,6 +9,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    text-align: center;
 }
 
 a[href^="http://maps.google.com/maps"]{display: none !important}
@@ -91,6 +92,7 @@ a[href^="https://maps.google.com/maps"]{display: none !important}
 #menuSpan {
     position:fixed;
     z-index: 1;
+    display:block;	
 }
 
 /* CSS for the challenges window */
@@ -154,7 +156,13 @@ a[href^="https://maps.google.com/maps"]{display: none !important}
     background-color: #d2f0ff;
     color: #359fd4;
 }
-
+/*Color for the challenge*/
+#challenge p {
+  color: #dae3ec;
+  font-size: 25px;
+  margin-top: 66px;
+  opacity:1 !important;
+}
 
 @media screen and (max-height: 450px) {
   .overlay a {font-size: 20px}

@@ -11,7 +11,7 @@ module.exports = (app) => {
     passport.use(new GoogleStrategy({
         clientID: '530099490791-e13gnvdek6bv6ftlcovuga493jrnrso2.apps.googleusercontent.com',
         clientSecret: 'z-xgz8YLUoKjgk7E2M98HSyb',
-        callbackURL: "http://cee4441f.ngrok.io/auth/google/googletoken"
+        callbackURL: "http://128.199.67.112.xip.io/auth/google/googletoken"
     }, function(accessToken, refreshToken, profile, cb) {
         User.findOrCreate({
             where:{googleId:profile.id}
