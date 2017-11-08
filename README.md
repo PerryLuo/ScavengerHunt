@@ -2,9 +2,7 @@
 
 Web platform for playing scavenger hunts 
 
-http://128.199.67.112.xip.io/login
-
-**Note:** For best experience, please use Firefox. Currently unavailable in Chrome.
+[Web demo available on request]
 
 ## Prototype Description
 
