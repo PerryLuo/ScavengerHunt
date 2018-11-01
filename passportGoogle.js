@@ -8,16 +8,20 @@ module.exports = (app) => {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    passport.use(new GoogleStrategy({
-        clientID: '530099490791-e13gnvdek6bv6ftlcovuga493jrnrso2.apps.googleusercontent.com',
-        clientSecret: 'z-xgz8YLUoKjgk7E2M98HSyb',
-        callbackURL: "http://128.199.67.112.xip.io/auth/google/googletoken"
-    }, function(accessToken, refreshToken, profile, cb) {
-        User.findOrCreate({
-            where:{googleId:profile.id}
-        })
-        .then( user => cb(null, user));
-    }));
+    passport.use(new GoogleStrategy(
+        {
+          clientID:
+            "530099490791-e13gnvdek6bv6ftlcovuga493jrnrso2.apps.googleusercontent.com",
+          clientSecret: "z-xgz8YLUoKjgk7E2M98HSyb",
+          callbackURL: "https://f2e9d4a6.ngrok.io/auth/google/googletoken"
+          // "http://128.199.67.112.xip.io/auth/google/googletoken"
+        },
+        function(accessToken, refreshToken, profile, cb) {
+          User.findOrCreate({
+            where: { googleId: profile.id }
+          }).then(user => cb(null, user));
+        }
+      ));
 
     passport.serializeUser((user, done) => done(null, user[0].id));
 
